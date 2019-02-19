@@ -6,6 +6,19 @@ type Individual struct {
 	ID  string   `json:"id"`
 }
 
+type IndividualCount struct {
+	Count int64  `json:"count"`
+	ID    string `json:"id"`
+}
+
+type IndividualsCount []IndividualsCount
+
+type IndividualStats struct {
+	CountMutant int64   `json:"count_mutant_dna"`
+	CountHuman  int64   `json:"count_human_dna"`
+	Ratio       float64 `json:"ratio"`
+}
+
 func isMutant(dna []string) bool {
 
 	var mutantDnaCount = 0

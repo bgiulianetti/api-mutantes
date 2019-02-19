@@ -2,13 +2,15 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
 //Stats me dice la canatidad de adn validos y no validos
 func Stats(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Las estadisticas todavia no estan guardadas")
+	stats := GetIndividualStats()
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(stats)
 }
 
 //DetectMutant detecta si el adn pasado es valido o no
@@ -23,10 +25,10 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if isMutant(individual.DNA) {
-		AddMutant(individual.DNA)
+		AddIndividual(individual.DNA, "mutant")
 		w.WriteHeader(200)
 	} else {
-		AddHuman()
+		AddIndividual(individual.DNA, "human")
 		w.WriteHeader(403)
 	}
 }
