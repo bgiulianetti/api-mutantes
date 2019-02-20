@@ -5,12 +5,17 @@ import (
 	"net/http"
 )
 
+//ApiError ..
+type ApiError struct {
+	Message string `json:"message"`
+}
+
 //Stats me dice la canatidad de adn validos y no validos
 func Stats(w http.ResponseWriter, r *http.Request) {
 	stats, err := GetIndividualStats()
 	if err != nil {
 		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(err)
+		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
 		return
 	}
 
@@ -24,19 +29,18 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var individual Individual
 	err := decoder.Decode(&individual)
-
+	defer r.Body.Close()
 	if err != nil {
 		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(err)
+		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
 		return
 	}
-	defer r.Body.Close()
 
 	if isMutant(individual.DNA) {
 		err = AddIndividual(individual.DNA, "mutant")
 		if err != nil {
 			w.WriteHeader(500)
-			json.NewEncoder(w).Encode(err)
+			json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
 			return
 		}
 		w.WriteHeader(200)
@@ -44,7 +48,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		err = AddIndividual(individual.DNA, "human")
 		if err != nil {
 			w.WriteHeader(500)
-			json.NewEncoder(w).Encode(err)
+			json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
 			return
 		}
 		w.WriteHeader(403)

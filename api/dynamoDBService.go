@@ -10,10 +10,13 @@ import (
 )
 
 // CreateSeason crea una sesion de conexión a dynamodb
-func CreateSeason() *dynamodb.DynamoDB {
-	sess, _ := session.NewSession(&aws.Config{Region: aws.String("sa-east-1")})
+func CreateSeason() (*dynamodb.DynamoDB, error) {
+	sess, err := session.NewSession(&aws.Config{Region: aws.String("sa-east-1")})
+	if err != nil {
+		return nil, err
+	}
 	svc := dynamodb.New(sess)
-	return svc
+	return svc, nil
 }
 
 // AddIndividual agrega un mutante a dynamodb
@@ -21,16 +24,23 @@ func AddIndividual(dna []string, individualType string) error {
 
 	individual := Individual{dna, GenerateTimeStamp()}
 	item, err := dynamodbattribute.MarshalMap(individual)
+	if err != nil {
+		return err
+	}
+
 	input := &dynamodb.PutItemInput{
 		Item:      item,
 		TableName: aws.String(individualType),
 	}
-	svc := CreateSeason()
-	_, err = svc.PutItem(input)
-
+	svc, err := CreateSeason()
 	if err != nil {
 		return err
 	}
+	_, err = svc.PutItem(input)
+	if err != nil {
+		return err
+	}
+
 	err = IncrementIndividualCount(svc, individualType)
 	if err != nil {
 		return err
@@ -41,17 +51,19 @@ func AddIndividual(dna []string, individualType string) error {
 // GetIndividualStats ...
 func GetIndividualStats() (IndividualStats, error) {
 
-	svc := CreateSeason()
+	svc, err := CreateSeason()
+	if err != nil {
+		return IndividualStats{}, err
+	}
+
 	result, err := svc.Scan(&dynamodb.ScanInput{
 		TableName: aws.String("individualCount"),
 	})
-
 	if err != nil {
 		return IndividualStats{}, err
 	}
 
 	items := []IndividualCount{}
-
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &items)
 	if err != nil {
 		return IndividualStats{}, err
@@ -65,6 +77,9 @@ func GetIndividualStats() (IndividualStats, error) {
 		if item.ID == "mutant" {
 			response.CountMutant = item.Count
 		}
+	}
+	if response.CountHuman == 0 {
+		return IndividualStats{}, fmt.Errorf("no puedo dividi por cero")
 	}
 	response.Ratio = float32(response.CountMutant / response.CountHuman)
 	return response, nil
@@ -80,7 +95,10 @@ func IncrementIndividualCount(svc *dynamodb.DynamoDB, individualType string) err
 	}
 	fmt.Println(item)
 	item.Count++
-	PutIndividualCount(svc, item)
+	err = PutIndividualCount(svc, item)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("Count "+individualType+": ", item.Count)
 
@@ -111,15 +129,16 @@ func GetIndividualCount(svc *dynamodb.DynamoDB, individualType string) (Individu
 }
 
 // PutIndividualCount ...
-func PutIndividualCount(svc *dynamodb.DynamoDB, item IndividualCount) {
+func PutIndividualCount(svc *dynamodb.DynamoDB, item IndividualCount) error {
 	itemMarshaled, err := dynamodbattribute.MarshalMap(item)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		return err
 	}
 	input := &dynamodb.PutItemInput{
 		Item:      itemMarshaled,
 		TableName: aws.String("individualCount"),
 	}
 	svc.PutItem(input)
+	return nil
 }
