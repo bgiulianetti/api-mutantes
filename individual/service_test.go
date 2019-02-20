@@ -1,10 +1,9 @@
-package models
+package individual
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestIsMutantWithMutantDNA(T *testing.T) {
+
 	mutantDNA := []string{
 		"ATGCGA",
 		"CAGTGC",
@@ -12,14 +11,15 @@ func TestIsMutantWithMutantDNA(T *testing.T) {
 		"AGAAGG",
 		"CCCCTA",
 		"TCACTG"}
+	mutant := Individual{DNA: mutantDNA, ID: "123456"}
 
-	if !isMutant(mutantDNA) {
+	if !mutant.IsMutant() {
 		T.Error("El adn debería ser mutante")
 	}
 }
 
 func TestIsMutantWithHumanDNA(T *testing.T) {
-	mutantDNA := []string{
+	humanDNA := []string{
 		"ATGCGA",
 		"CAGTGC",
 		"TTATGT",
@@ -27,7 +27,8 @@ func TestIsMutantWithHumanDNA(T *testing.T) {
 		"TACCTA",
 		"TCACTG"}
 
-	if isMutant(mutantDNA) {
+	human := Individual{DNA: humanDNA, ID: "123456"}
+	if human.IsMutant() {
 		T.Error("El adn debería ser humano")
 	}
 }
@@ -41,13 +42,14 @@ func TestIsDnaFormatValidWithValidDNA(T *testing.T) {
 		"AAAAAA",
 		"AAAAAA"}
 
-	if !isDnaFormatValid(validDNA) {
+	individualWithValidDNA := Individual{DNA: validDNA, ID: "123456"}
+	if !individualWithValidDNA.IsDnaFormatValid() {
 		T.Error("El adn debería ser valido")
 	}
 }
 
 func TestIsDnaFormatValidWithFiveCharString(T *testing.T) {
-	validDNA := []string{
+	invalidDNA := []string{
 		"AAAAA",
 		"AAAAAA",
 		"AAAAAA",
@@ -55,54 +57,59 @@ func TestIsDnaFormatValidWithFiveCharString(T *testing.T) {
 		"AAAAAA",
 		"AAAAAA"}
 
-	if isDnaFormatValid(validDNA) {
+	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
+	if individualWithInvalidDNA.IsDnaFormatValid() {
 		T.Error("El adn debería ser invalido")
 	}
 }
 
 func TestIsDnaFormatValidWithFiveStringLength(T *testing.T) {
-	validDNA := []string{
+	invalidDNA := []string{
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA"}
 
-	if isDnaFormatValid(validDNA) {
+	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
+	if individualWithInvalidDNA.IsDnaFormatValid() {
 		T.Error("El adn debería ser invalido")
 	}
 }
 
 func TestIsDnaFormatValidWithEmptyArray(T *testing.T) {
-	validDNA := []string{}
+	invalidDNA := []string{}
 
-	if isDnaFormatValid(validDNA) {
+	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
+	if individualWithInvalidDNA.IsDnaFormatValid() {
 		T.Error("El adn debería ser invalido")
 	}
 }
 
 func TestIsDnaFormatValidWithWrongChars(T *testing.T) {
-	validDNA := []string{
+	invalidDNA := []string{
 		"AAXAAA",
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA"}
 
-	if isDnaFormatValid(validDNA) {
+	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
+	if individualWithInvalidDNA.IsDnaFormatValid() {
 		T.Error("El adn debería ser invalido")
 	}
 }
 
 func TestIsDnaFormatValidWithWrongCharsTwo(T *testing.T) {
-	validDNA := []string{
+	invalidDNA := []string{
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAQ"}
 
-	if isDnaFormatValid(validDNA) {
+	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
+	if individualWithInvalidDNA.IsDnaFormatValid() {
 		T.Error("El adn debería ser invalido")
 	}
 }
