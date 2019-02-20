@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/bgiulianetti/api-mutantes/individual"
-	"github.com/bgiulianetti/api-mutantes/utils"
 )
 
 // PersistenceService ...
@@ -28,10 +27,9 @@ func NewPersistenceService() (PersistenceService, error) {
 }
 
 // Add agrega un mutante a dynamodb
-func (p PersistenceService) Add(dna []string, individualType string) error {
+func (p PersistenceService) Add(individual individual.Individual, individualType string) error {
 
-	newIndividual := individual.Individual{DNA: dna, ID: utils.GenerateTimeStamp()}
-	item, err := dynamodbattribute.MarshalMap(newIndividual)
+	item, err := dynamodbattribute.MarshalMap(individual)
 	if err != nil {
 		return err
 	}
@@ -124,6 +122,30 @@ func (p PersistenceService) GetCount(individualType string) (individual.Count, e
 		return individual.Count{}, err
 	}
 	return count, nil
+}
+
+// Get ...
+func (p PersistenceService) Get(id string, individualType string) (individual.Individual, error) {
+
+	result, err := p.Session.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String(individualType),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+	})
+
+	if err != nil {
+		return individual.Individual{}, err
+	}
+
+	individualGotten := individual.Individual{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &individualGotten)
+	if err != nil {
+		return individual.Individual{}, err
+	}
+	return individualGotten, nil
 }
 
 // PutIndividualCount ...
