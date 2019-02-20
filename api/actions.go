@@ -32,3 +32,8 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(403)
 	}
 }
+
+// Health ...
+func Health(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+}

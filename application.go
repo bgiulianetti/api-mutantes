@@ -1,9 +1,10 @@
 package main
 
 import (
-	"api"
 	"log"
 	"net/http"
+
+	"github.com/bgiulianetti/api-mutantes/api"
 )
 
 func main() {
