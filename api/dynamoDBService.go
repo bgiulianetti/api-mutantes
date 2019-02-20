@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -66,7 +66,7 @@ func GetIndividualStats() IndividualStats {
 			response.CountMutant = item.Count
 		}
 	}
-	response.Ratio = 0.3 //response.CountMutant / response.CountHuman
+	response.Ratio = float32(response.CountMutant / response.CountHuman)
 	return response
 }
 

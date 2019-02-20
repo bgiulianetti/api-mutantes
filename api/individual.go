@@ -1,4 +1,4 @@
-package main
+package api
 
 // Individual struct
 type Individual struct {
@@ -16,7 +16,7 @@ type IndividualsCount []IndividualsCount
 type IndividualStats struct {
 	CountMutant int64   `json:"count_mutant_dna"`
 	CountHuman  int64   `json:"count_human_dna"`
-	Ratio       float64 `json:"ratio"`
+	Ratio       float32 `json:"ratio"`
 }
 
 func isMutant(dna []string) bool {
