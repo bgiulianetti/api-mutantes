@@ -28,6 +28,25 @@ func TestAdd(T *testing.T) {
 	}
 }
 
+func TestAddWithWrongIndividualType(T *testing.T) {
+
+	mutantDNA := []string{
+		"ATGCGA",
+		"CAGTGC",
+		"TTATGT",
+		"AGAAGG",
+		"CCCCTA",
+		"TCACTG"}
+
+	mutant := individual.Individual{DNA: mutantDNA, ID: "123456"}
+
+	service, _ := NewPersistenceService()
+	err := service.Add(mutant, "pepe")
+	if err == nil {
+		T.Error("El error no debería ser nil, el tipo 'pepe' no existe")
+	}
+}
+
 func TestGetCount(T *testing.T) {
 
 	service, _ := NewPersistenceService()
@@ -42,6 +61,15 @@ func TestGetCount(T *testing.T) {
 
 	if mutantCountAfterAdd.Count != mutantCount.Count+1 {
 		T.Error("El count debería ser el mismo")
+	}
+}
+
+func TestGetWithWrongType(T *testing.T) {
+
+	service, _ := NewPersistenceService()
+	_, err := service.Get("1234", "pepe")
+	if err == nil {
+		T.Error("El error no debería ser nil, el tipo 'pepe' no existe")
 	}
 }
 
