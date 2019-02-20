@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/bgiulianetti/api-mutantes/individual"
+	"github.com/bgiulianetti/api-mutantes/utils"
 )
 
 // PersistenceService ...
@@ -27,9 +28,11 @@ func NewPersistenceService() (PersistenceService, error) {
 }
 
 // Add agrega un mutante a dynamodb
-func (p PersistenceService) Add(individual individual.Individual, individualType string) error {
+func (p PersistenceService) Add(individualToPersist individual.Individual, individualType string) error {
 
-	item, err := dynamodbattribute.MarshalMap(individual)
+	dto := individual.DTO{ID: utils.ConcatenateStringArray(individualToPersist.DNA)}
+
+	item, err := dynamodbattribute.MarshalMap(dto)
 	if err != nil {
 		return err
 	}

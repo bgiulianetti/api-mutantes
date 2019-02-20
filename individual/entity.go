@@ -6,6 +6,11 @@ type Individual struct {
 	ID  string   `json:"id"`
 }
 
+// DTO ...
+type DTO struct {
+	ID string `json:"id"`
+}
+
 // Count ...
 type Count struct {
 	Count int64  `json:"count"`

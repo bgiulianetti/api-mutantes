@@ -28,3 +28,12 @@ func GenerateTimeStamp() string {
 	return uuid
 
 }
+
+// ConcatenateStringArray ...
+func ConcatenateStringArray(array []string) string {
+	cadena := ""
+	for _, element := range array {
+		cadena += element
+	}
+	return cadena
+}

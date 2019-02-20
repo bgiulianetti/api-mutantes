@@ -6,7 +6,6 @@ import (
 
 	"github.com/bgiulianetti/api-mutantes/individual"
 	"github.com/bgiulianetti/api-mutantes/repositories"
-	"github.com/bgiulianetti/api-mutantes/utils"
 )
 
 //ApiError ..
@@ -55,7 +54,8 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
 		return
 	}
-	individual.ID = utils.GenerateTimeStamp()
+
+	//individual.ID = utils.GenerateTimeStamp()
 	if individual.IsMutant() {
 
 		err = service.Add(individual, "mutant")
