@@ -39,7 +39,7 @@ func AddIndividual(dna []string, individualType string) error {
 }
 
 // GetIndividualStats ...
-func GetIndividualStats() IndividualStats {
+func GetIndividualStats() (IndividualStats, error) {
 
 	svc := CreateSeason()
 	result, err := svc.Scan(&dynamodb.ScanInput{
@@ -47,14 +47,14 @@ func GetIndividualStats() IndividualStats {
 	})
 
 	if err != nil {
-		fmt.Println("failed to make Query API call", err)
+		return IndividualStats{}, err
 	}
 
 	items := []IndividualCount{}
 
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &items)
 	if err != nil {
-		fmt.Println("failed to unmarshal Query result items", err)
+		return IndividualStats{}, err
 	}
 	response := IndividualStats{}
 
@@ -67,7 +67,7 @@ func GetIndividualStats() IndividualStats {
 		}
 	}
 	response.Ratio = float32(response.CountMutant / response.CountHuman)
-	return response
+	return response, nil
 }
 
 // IncrementIndividualCount ...

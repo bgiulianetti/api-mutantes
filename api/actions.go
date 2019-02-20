@@ -7,7 +7,13 @@ import (
 
 //Stats me dice la canatidad de adn validos y no validos
 func Stats(w http.ResponseWriter, r *http.Request) {
-	stats := GetIndividualStats()
+	stats, err := GetIndividualStats()
+	if err != nil {
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(stats)
@@ -22,14 +28,25 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(err)
+		return
 	}
 	defer r.Body.Close()
 
 	if isMutant(individual.DNA) {
-		AddIndividual(individual.DNA, "mutant")
+		err = AddIndividual(individual.DNA, "mutant")
+		if err != nil {
+			w.WriteHeader(500)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
 		w.WriteHeader(200)
 	} else {
-		AddIndividual(individual.DNA, "human")
+		err = AddIndividual(individual.DNA, "human")
+		if err != nil {
+			w.WriteHeader(500)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
 		w.WriteHeader(403)
 	}
 }
