@@ -2,6 +2,7 @@ package api
 
 import "net/http"
 
+// Route ...
 type Route struct {
 	Name        string
 	Method      string
@@ -9,4 +10,5 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
+// Routes ...
 type Routes []Route
