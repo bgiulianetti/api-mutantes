@@ -3,6 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/bgiulianetti/api-mutantes/individual"
+	"github.com/bgiulianetti/api-mutantes/repositories"
 )
 
 //ApiError ..
@@ -12,7 +15,15 @@ type ApiError struct {
 
 //Stats me dice la canatidad de adn validos y no validos
 func Stats(w http.ResponseWriter, r *http.Request) {
-	stats, err := GetIndividualStats()
+
+	service, err := repositories.NewPersistenceService()
+	if err != nil {
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
+		return
+	}
+
+	stats, err := service.GetStats()
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
@@ -26,8 +37,9 @@ func Stats(w http.ResponseWriter, r *http.Request) {
 
 //DetectMutant detecta si el adn pasado es valido o no
 func DetectMutant(w http.ResponseWriter, r *http.Request) {
+
 	decoder := json.NewDecoder(r.Body)
-	var individual Individual
+	var individual individual.Individual
 	err := decoder.Decode(&individual)
 	defer r.Body.Close()
 	if err != nil {
@@ -36,8 +48,16 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isMutant(individual.DNA) {
-		err = AddIndividual(individual.DNA, "mutant")
+	service, err := repositories.NewPersistenceService()
+	if err != nil {
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
+		return
+	}
+
+	if individual.IsMutant() {
+
+		err = service.Add(individual.DNA, "mutant")
 		if err != nil {
 			w.WriteHeader(500)
 			json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
@@ -45,7 +65,8 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(200)
 	} else {
-		err = AddIndividual(individual.DNA, "human")
+
+		err = service.Add(individual.DNA, "human")
 		if err != nil {
 			w.WriteHeader(500)
 			json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
@@ -55,7 +76,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Health ...
+// Health check...
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }

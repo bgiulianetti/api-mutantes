@@ -1,28 +1,11 @@
-package api
+package individual
 
-// Individual struct
-type Individual struct {
-	DNA []string `json:"dna"`
-	ID  string   `json:"id"`
-}
+// IsMutant Check if the individual is Mutant
+func (i Individual) IsMutant() bool {
 
-type IndividualCount struct {
-	Count int64  `json:"count"`
-	ID    string `json:"id"`
-}
-
-type IndividualsCount []IndividualsCount
-
-type IndividualStats struct {
-	CountMutant int64   `json:"count_mutant_dna"`
-	CountHuman  int64   `json:"count_human_dna"`
-	Ratio       float32 `json:"ratio"`
-}
-
-func isMutant(dna []string) bool {
-
+	dna := i.DNA
 	var mutantDnaCount = 0
-	if !isDnaFormatValid(dna) {
+	if !i.IsDnaFormatValid() {
 		return true
 	}
 
@@ -70,8 +53,10 @@ func isMutant(dna []string) bool {
 	return false
 }
 
-func isDnaFormatValid(dna []string) bool {
+// IsDnaFormatValid Checks if the dna is well formated
+func (i Individual) IsDnaFormatValid() bool {
 
+	dna := i.DNA
 	if len(dna) != 6 {
 		return false
 	}
