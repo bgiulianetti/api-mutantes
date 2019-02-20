@@ -20,7 +20,8 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&individual)
 
 	if err != nil {
-		panic(err)
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(err)
 	}
 	defer r.Body.Close()
 

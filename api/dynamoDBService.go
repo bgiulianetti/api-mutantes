@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -18,7 +17,7 @@ func CreateSeason() *dynamodb.DynamoDB {
 }
 
 // AddIndividual agrega un mutante a dynamodb
-func AddIndividual(dna []string, individualType string) {
+func AddIndividual(dna []string, individualType string) error {
 
 	individual := Individual{dna, GenerateTimeStamp()}
 	item, err := dynamodbattribute.MarshalMap(individual)
@@ -30,12 +29,13 @@ func AddIndividual(dna []string, individualType string) {
 	_, err = svc.PutItem(input)
 
 	if err != nil {
-		fmt.Println("Error al guardar un individuo en la BD")
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return err
 	}
-	//fmt.Println("Agregaste un " + individualType + " exitosamente")
-	IncrementIndividualCount(svc, individualType)
+	err = IncrementIndividualCount(svc, individualType)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetIndividualStats ...
@@ -71,18 +71,24 @@ func GetIndividualStats() IndividualStats {
 }
 
 // IncrementIndividualCount ...
-func IncrementIndividualCount(svc *dynamodb.DynamoDB, individualType string) {
+func IncrementIndividualCount(svc *dynamodb.DynamoDB, individualType string) error {
 
-	item := GetIndividualCount(svc, individualType)
+	item, err := GetIndividualCount(svc, individualType)
+
+	if err != nil {
+		return err
+	}
 	fmt.Println(item)
 	item.Count++
 	PutIndividualCount(svc, item)
 
 	fmt.Println("Count "+individualType+": ", item.Count)
+
+	return nil
 }
 
 // GetIndividualCount ...
-func GetIndividualCount(svc *dynamodb.DynamoDB, individualType string) IndividualCount {
+func GetIndividualCount(svc *dynamodb.DynamoDB, individualType string) (IndividualCount, error) {
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String("individualCount"),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -93,15 +99,15 @@ func GetIndividualCount(svc *dynamodb.DynamoDB, individualType string) Individua
 	})
 
 	if err != nil {
-		fmt.Println(err.Error())
+		return IndividualCount{}, err
 	}
 
 	item := IndividualCount{}
 	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to unmarshal record %v", err))
+		return IndividualCount{}, err
 	}
-	return item
+	return item, nil
 }
 
 // PutIndividualCount ...
