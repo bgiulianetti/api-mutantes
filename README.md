@@ -44,7 +44,19 @@ ___
 Para poder correr la API de forma local se requiere tener instalado
 - Java (requirements: https://docs.oracle.com/javase/7/docs/webnotes/install/windows/windows-system-requirements.html)
 - Go (requirements: https://golang.org/doc/install)
+- AWS CLI isntalada y configurada
+- AWS SDK for GO (instalar mediante comando: go get github.com/aws/aws-sdk-go)
+- Gorilla MUX (instalar mediante comando: go get -u github.com/gorilla/mux)
 
+Para poder correr el proyecto se debe parar a raíz del proyecto y ejecutar el comando:
+```
+go run application.go
+```
+El proyecto por defecto correra en el puerto :5000. Si este puerto se lo tiene ocupado o no se puede correr la api en el mismo por alguna restricción de su entorno de trabajo, puede modificarlo desde el archivo application.go que se encuentra a raíz en la línea 13.
+
+```
+	server := http.ListenAndServe(":5000", router) // Cambiar por el puerto de preferencia
+```
 ___
 
 ### Tests
