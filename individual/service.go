@@ -5,9 +5,6 @@ func (i Individual) IsMutant() bool {
 
 	dna := i.DNA
 	var mutantDnaCount = 0
-	if !i.IsDnaFormatValid() {
-		return true
-	}
 
 	for y := 0; y < len(dna); y++ {
 		for x := 0; x < len(dna); x++ {

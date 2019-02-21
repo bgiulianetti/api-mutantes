@@ -48,6 +48,11 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !individual.IsDnaFormatValid() {
+		w.WriteHeader(400)
+		return
+	}
+
 	service, err := repositories.NewPersistenceService()
 	if err != nil {
 		w.WriteHeader(500)
