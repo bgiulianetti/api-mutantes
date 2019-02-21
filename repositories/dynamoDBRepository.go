@@ -13,7 +13,19 @@ import (
 
 // PersistenceService ...
 type PersistenceService struct {
-	Session *dynamodb.DynamoDB
+	Session Client
+}
+
+// Client ...
+type Client interface {
+	PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
+	GetItem(input *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error)
+	Scan(input *dynamodb.ScanInput) (*dynamodb.ScanOutput, error)
+}
+
+// NewPersistenceServiceWithClient crea una sesion de conexión a dynamodb
+func NewPersistenceServiceWithClient(cliente Client) (PersistenceService, error) {
+	return PersistenceService{Session: cliente}, nil
 }
 
 // NewPersistenceService crea una sesion de conexión a dynamodb
@@ -30,9 +42,9 @@ func NewPersistenceService() (PersistenceService, error) {
 // Add agrega un mutante a dynamodb
 func (p PersistenceService) Add(individualToPersist individual.Individual, individualType string) error {
 
-	dto := individual.DTO{ID: utils.ConcatenateStringArray(individualToPersist.DNA)}
+	individualToPersist.ID = utils.ConcatenateStringArray(individualToPersist.DNA)
 
-	item, err := dynamodbattribute.MarshalMap(dto)
+	item, err := dynamodbattribute.MarshalMap(individualToPersist)
 	if err != nil {
 		return err
 	}
@@ -41,6 +53,7 @@ func (p PersistenceService) Add(individualToPersist individual.Individual, indiv
 		Item:      item,
 		TableName: aws.String(individualType),
 	}
+
 	_, err = p.Session.PutItem(input)
 	if err != nil {
 		return err
@@ -106,8 +119,9 @@ func (p PersistenceService) IncrementCount(individualType string) error {
 // GetCount ...
 func (p PersistenceService) GetCount(individualType string) (individual.Count, error) {
 
+	tabla := "individualCount"
 	result, err := p.Session.GetItem(&dynamodb.GetItemInput{
-		TableName: aws.String("individualCount"),
+		TableName: &tabla,
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(individualType),
@@ -125,30 +139,6 @@ func (p PersistenceService) GetCount(individualType string) (individual.Count, e
 		return individual.Count{}, err
 	}
 	return count, nil
-}
-
-// Get ...
-func (p PersistenceService) Get(id string, individualType string) (individual.Individual, error) {
-
-	result, err := p.Session.GetItem(&dynamodb.GetItemInput{
-		TableName: aws.String(individualType),
-		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(id),
-			},
-		},
-	})
-
-	if err != nil {
-		return individual.Individual{}, err
-	}
-
-	individualGotten := individual.Individual{}
-	err = dynamodbattribute.UnmarshalMap(result.Item, &individualGotten)
-	if err != nil {
-		return individual.Individual{}, err
-	}
-	return individualGotten, nil
 }
 
 // PutIndividualCount ...

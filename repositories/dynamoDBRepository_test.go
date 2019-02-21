@@ -1,56 +1,180 @@
 package repositories
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/bgiulianetti/api-mutantes/individual"
 )
 
-func TestAdd(T *testing.T) {
+type MockClient struct {
+	PutResponse  *dynamodb.PutItemOutput
+	GetResponse  *dynamodb.GetItemOutput
+	ScanResponse *dynamodb.ScanOutput
+	PutError     error
+	GetError     error
+	ScanError    error
+}
 
-	mutantDNA := []string{
-		"ATGCGA",
-		"CAGTGC",
-		"TTATGT",
-		"AGAAGG",
-		"CCCCTA",
-		"TCACTG"}
+func (m MockClient) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	return m.PutResponse, m.PutError
+}
 
+func (m MockClient) GetItem(input *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
+	return m.GetResponse, m.GetError
+}
+
+func (m MockClient) Scan(input *dynamodb.ScanInput) (*dynamodb.ScanOutput, error) {
+	return m.ScanResponse, m.ScanError
+}
+
+func TestAddOk(T *testing.T) {
+
+	mutantDNA := []string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
 	mutant := individual.Individual{DNA: mutantDNA, ID: "123456"}
+	cliente := MockClient{
+		GetResponse: &dynamodb.GetItemOutput{Item: map[string]*dynamodb.AttributeValue{}},
+		PutResponse: &dynamodb.PutItemOutput{},
+		PutError:    nil,
+		GetError:    nil,
+		ScanError:   nil,
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
 
-	service, _ := NewPersistenceService()
-	service.Add(mutant, "mutant")
-
-	mutantGotten, _ := service.Get(mutant.ID, "mutant")
-
-	if mutantGotten.ID != mutant.ID {
-		T.Error("El id debería ser el mismo")
+	err := service.Add(mutant, "mutante")
+	if err != nil {
+		T.Error("Error debería ser nil")
 	}
 }
 
-func TestAddWithWrongIndividualType(T *testing.T) {
+func TestAddWithPutError(T *testing.T) {
 
-	mutantDNA := []string{
-		"ATGCGA",
-		"CAGTGC",
-		"TTATGT",
-		"AGAAGG",
-		"CCCCTA",
-		"TCACTG"}
-
+	mutantDNA := []string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
 	mutant := individual.Individual{DNA: mutantDNA, ID: "123456"}
+	cliente := MockClient{
+		PutResponse: &dynamodb.PutItemOutput{},
+		PutError:    errors.New("La el tipo de individuo es invalido"),
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
 
-	service, _ := NewPersistenceService()
-	err := service.Add(mutant, "pepe")
+	err := service.Add(mutant, "mutante")
 	if err == nil {
-		T.Error("El error no debería ser nil, el tipo 'pepe' no existe")
+		T.Error("El error es nulo")
 	}
 }
 
+func TestGetStatsWithScanError(T *testing.T) {
+
+	cliente := MockClient{
+		GetResponse: &dynamodb.GetItemOutput{Item: map[string]*dynamodb.AttributeValue{}},
+		PutResponse: &dynamodb.PutItemOutput{},
+		ScanError:   errors.New("falla"),
+		PutError:    nil,
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
+
+	_, err := service.GetStats()
+	if err == nil {
+		T.Error("El error es nulo")
+	}
+}
+
+func TestGetStatsOk(T *testing.T) {
+
+	statsExpected := individual.Stats{}
+	cliente := MockClient{
+		ScanResponse: &dynamodb.ScanOutput{Items: []map[string]*dynamodb.AttributeValue{}},
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
+
+	stats, _ := service.GetStats()
+	if stats == statsExpected {
+		T.Error("El error es nulo")
+	}
+}
+
+func TestGetStatsOkWithMutant(T *testing.T) {
+
+	mutant := individual.Count{
+		ID:    "mutant",
+		Count: 0,
+	}
+
+	item, _ := dynamodbattribute.MarshalMap(mutant)
+
+	statsExpected := individual.Stats{}
+	cliente := MockClient{
+		ScanResponse: &dynamodb.ScanOutput{
+			Items: []map[string]*dynamodb.AttributeValue{item},
+		},
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
+
+	stats, _ := service.GetStats()
+	if stats == statsExpected {
+		T.Error("El error es nulo")
+	}
+}
+
+func TestGetStatsOkWithHuman(T *testing.T) {
+
+	human := individual.Count{
+		ID:    "human",
+		Count: 1,
+	}
+
+	item, _ := dynamodbattribute.MarshalMap(human)
+
+	statsExpected := individual.Stats{}
+	cliente := MockClient{
+		ScanResponse: &dynamodb.ScanOutput{
+			Items: []map[string]*dynamodb.AttributeValue{item},
+		},
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
+
+	stats, _ := service.GetStats()
+	if stats == statsExpected {
+		T.Error("El error es nulo")
+	}
+}
+
+///////////////
+
+func TestIncrementCountWithGetResponseError(T *testing.T) {
+
+	cliente := MockClient{
+		GetResponse: &dynamodb.GetItemOutput{Item: map[string]*dynamodb.AttributeValue{}},
+		PutResponse: nil,
+		ScanError:   nil,
+		PutError:    nil,
+	}
+	service, _ := NewPersistenceServiceWithClient(cliente)
+
+	err := service.IncrementCount("mutant")
+	if err != nil {
+		T.Error("El error es nulo")
+	}
+}
+
+/*
 func TestGetCount(T *testing.T) {
 
-	service, _ := NewPersistenceService()
+
+	cliente := MockClient{
+		ScanResponse: &dynamodb.ScanOutput{},
+		Error:       nil,
+	}
+
+	service, _ := NewPersistenceServiceWithClient(cliente)
+	count, err := service.GetCount("mutant")
+	if err == nil
+
+
 	mutantCount, _ := service.GetCount("mutant")
+
 
 	mutantDNA := []string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
 	mutant := individual.Individual{DNA: mutantDNA, ID: "123456"}
@@ -62,30 +186,6 @@ func TestGetCount(T *testing.T) {
 	if mutantCountAfterAdd.Count != mutantCount.Count+1 {
 		T.Error("El count debería ser el mismo")
 	}
-}
 
-func TestGetWithWrongType(T *testing.T) {
 
-	service, _ := NewPersistenceService()
-	_, err := service.Get("1234", "pepe")
-	if err == nil {
-		T.Error("El error no debería ser nil, el tipo 'pepe' no existe")
-	}
-}
-
-func TestGetStats(T *testing.T) {
-
-	service, _ := NewPersistenceService()
-	mutantCount, _ := service.GetCount("mutant")
-	humanCount, _ := service.GetCount("human")
-
-	stats, _ := service.GetStats()
-
-	if stats.CountHuman != float64(humanCount.Count) {
-		T.Error("El count de humanos debería ser el mismo")
-	}
-	if stats.CountMutant != float64(mutantCount.Count) {
-		T.Error("El count debería ser el mismo")
-	}
-
-}
+*/

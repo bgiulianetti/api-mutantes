@@ -60,7 +60,6 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//individual.ID = utils.GenerateTimeStamp()
 	if individual.IsMutant() {
 
 		err = service.Add(individual, "mutant")
