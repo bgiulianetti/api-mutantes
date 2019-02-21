@@ -40,6 +40,22 @@ Si el individuo es mutante devuelve un 200 Ok
 ```
 ___
 
+### Dev
+Para poder correr la API de forma local se requiere tener instalado
+- Java (requirements: https://docs.oracle.com/javase/7/docs/webnotes/install/windows/windows-system-requirements.html)
+- Go (requirements: https://golang.org/doc/install)
+
+___
+
+### Tests
+
+- Todos los test se encuentran a nivel de cada package
+- Para correr los tests dentro de cad package correr
+``` 
+go test
+```
+___
+
 ### Arquitectura
 - Se decidió utilizar Amazon AWS como servicio Cloud. 
 - Se publicó el servicio de API en ElasticBeanstalk, ya que provee un ambiente seteado para poder correr golang, permitiendome concentrar en la infraestructura. 
