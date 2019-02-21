@@ -156,34 +156,3 @@ func TestIncrementCountWithGetResponseError(T *testing.T) {
 		T.Error("El error es nulo")
 	}
 }
-
-/*
-func TestGetCount(T *testing.T) {
-
-
-	cliente := MockClient{
-		ScanResponse: &dynamodb.ScanOutput{},
-		Error:       nil,
-	}
-
-	service, _ := NewPersistenceServiceWithClient(cliente)
-	count, err := service.GetCount("mutant")
-	if err == nil
-
-
-	mutantCount, _ := service.GetCount("mutant")
-
-
-	mutantDNA := []string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
-	mutant := individual.Individual{DNA: mutantDNA, ID: "123456"}
-
-	service.Add(mutant, "mutant")
-
-	mutantCountAfterAdd, _ := service.GetCount("mutant")
-
-	if mutantCountAfterAdd.Count != mutantCount.Count+1 {
-		T.Error("El count debería ser el mismo")
-	}
-
-
-*/
