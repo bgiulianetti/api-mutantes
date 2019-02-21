@@ -31,3 +31,16 @@ func TestConvertToUpperCase(T *testing.T) {
 		}
 	}
 }
+
+func TestConcatenateDNA(T *testing.T) {
+
+	array := []string{
+		"abc",
+		"def"}
+
+	concatenatedArray := ConcatenateStringArray(array)
+
+	if concatenatedArray != "abcdef" {
+		T.Error("Las cadenas deberían ser iguales")
+	}
+}

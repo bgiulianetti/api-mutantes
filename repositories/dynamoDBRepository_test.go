@@ -141,8 +141,6 @@ func TestGetStatsOkWithHuman(T *testing.T) {
 	}
 }
 
-///////////////
-
 func TestIncrementCountWithGetResponseError(T *testing.T) {
 
 	cliente := MockClient{
