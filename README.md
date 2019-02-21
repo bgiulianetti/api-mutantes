@@ -81,7 +81,7 @@ Además, se configuró un Cluster DAX (DynamoDB Accelerator) con 3 nodos para po
 
 ___
 ### Endpoints
-__/mutants__
+__/mutant__
 ``` 
 http://apimutantes-env.mmizwaripz.sa-east-1.elasticbeanstalk.com/mutant
 ``` 
