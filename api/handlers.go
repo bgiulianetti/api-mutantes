@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/bgiulianetti/api-mutantes/utils"
+
 	"github.com/bgiulianetti/api-mutantes/individual"
 	"github.com/bgiulianetti/api-mutantes/repositories"
 )
@@ -48,6 +50,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	individual.DNA = utils.ConvertToUpperCase(individual.DNA)
 	if !individual.IsDnaFormatValid() {
 		w.WriteHeader(400)
 		return

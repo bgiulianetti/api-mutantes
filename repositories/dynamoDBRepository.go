@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -59,10 +60,6 @@ func (p PersistenceService) Add(individualToPersist individual.Individual, indiv
 		return err
 	}
 
-	err = p.IncrementCount(individualType)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -94,7 +91,8 @@ func (p PersistenceService) GetStats() (individual.Stats, error) {
 	if response.CountHuman == 0 {
 		response.Ratio = 1
 	} else {
-		response.Ratio = response.CountMutant / response.CountHuman
+		ratio := response.CountMutant / response.CountHuman
+		response.Ratio = math.Round(ratio*100) / 100
 	}
 	return response, nil
 }
