@@ -17,7 +17,7 @@ Si el individuo es mutante, devuelve un 200 Ok.
 ```
    200 Ok (Es mutante)
    403 Forbidden (Es humano)
-   400 Bad Request (el payload enviado no cumplia con el formato correcto)
+   400 Bad Request (El payload enviado no cumple con el formato correcto)
    
 ```
 
@@ -75,7 +75,8 @@ ___
 Se creó con un auto scaling de 1 a 4 instancias y con un elastic load balancer para distribuir la carga. 
 Todas las instancias corren en la región de San Pablo, la cual es la mas cercana y, por lo tanto, produce menor latencia.
 - Para la persistencia, se decidió utilizar DynamoDB, un servicio de base de datos NoSQL de AWS. Con este servicio, se pueden realizar peticiones de escritura y lectura de alta demanda. Se configuró un auto scaling para que responda bajo demanda. 
-Con cada adn nuevo guardado se acola un mensaje nuevo en DynamoDB Streams y un cunsumidor (Lambda Function) obtiene uno a uno los mensajes y guarda la cuenta de humanos y mutantes en una tabla aparte en DynamoDB.
+Con cada adn nuevo guardado se acola un mensaje nuevo en DynamoDB Streams y un consumidor (Lambda Function) obtiene uno a uno los mensajes y guarda la cuenta de humanos y mutantes en una tabla aparte en DynamoDB. 
+En caso de que algún error pueda ocurrir y no se pueda persistir el adn validado, este se guarda un log en un bucket en S3 para su posterior estudio y eventual correcto guardado, de esta manera garantizamos que no se produzca perdida de información en el caso de que falle la persistencia a DynamoDB.
 ![logo]
 
 [logo]:https://github.com/bgiulianetti/api-mutantes/blob/master/architecture/architecture-diagram.png "Arquitectura"
