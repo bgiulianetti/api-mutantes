@@ -17,6 +17,7 @@ Si el individuo es mutante, devuelve un 200 Ok.
 ```
    200 Ok (Es mutante)
    403 Forbidden (Es humano)
+   400 Bad Request (el payload enviado no cumplia con el formato correcto)
    
 ```
 
