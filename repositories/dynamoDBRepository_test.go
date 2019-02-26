@@ -140,19 +140,3 @@ func TestGetStatsOkWithHuman(T *testing.T) {
 		T.Error("El error es nulo")
 	}
 }
-
-func TestIncrementCountWithGetResponseError(T *testing.T) {
-
-	cliente := MockClient{
-		GetResponse: &dynamodb.GetItemOutput{Item: map[string]*dynamodb.AttributeValue{}},
-		PutResponse: nil,
-		ScanError:   nil,
-		PutError:    nil,
-	}
-	service, _ := NewPersistenceServiceWithClient(cliente)
-
-	err := service.IncrementCount("mutant")
-	if err != nil {
-		T.Error("El error es nulo")
-	}
-}

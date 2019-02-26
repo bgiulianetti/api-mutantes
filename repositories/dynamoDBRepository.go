@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -95,61 +94,4 @@ func (p PersistenceService) GetStats() (individual.Stats, error) {
 		response.Ratio = math.Round(ratio*100) / 100
 	}
 	return response, nil
-}
-
-// IncrementCount ...
-func (p PersistenceService) IncrementCount(individualType string) error {
-
-	item, err := p.GetCount(individualType)
-	if err != nil {
-		return err
-	}
-	fmt.Println(item)
-	item.Count++
-	err = p.PutIndividualCount(item)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Count "+individualType+": ", item.Count)
-	return nil
-}
-
-// GetCount ...
-func (p PersistenceService) GetCount(individualType string) (individual.Count, error) {
-
-	tabla := "individualCount"
-	result, err := p.Session.GetItem(&dynamodb.GetItemInput{
-		TableName: &tabla,
-		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(individualType),
-			},
-		},
-	})
-
-	if err != nil {
-		return individual.Count{}, err
-	}
-
-	count := individual.Count{}
-	err = dynamodbattribute.UnmarshalMap(result.Item, &count)
-	if err != nil {
-		return individual.Count{}, err
-	}
-	return count, nil
-}
-
-// PutIndividualCount ...
-func (p PersistenceService) PutIndividualCount(count individual.Count) error {
-
-	itemMarshaled, err := dynamodbattribute.MarshalMap(count)
-	if err != nil {
-		return err
-	}
-	input := &dynamodb.PutItemInput{
-		Item:      itemMarshaled,
-		TableName: aws.String("individualCount"),
-	}
-	p.Session.PutItem(input)
-	return nil
 }
