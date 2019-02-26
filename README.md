@@ -71,13 +71,13 @@ ___
 ### Arquitectura
 - Se decidió utilizar Amazon AWS como servicio Cloud. 
 - Se publicó el servicio de API en ElasticBeanstalk, ya que provee un ambiente seteado para poder correr golang, lo que permitió que me concentrara en la infraestructura. 
-Se creó con un auto scaling de 1 a 4 instancias y con un loadbalancer para distribuir la carga. 
+Se creó con un auto scaling de 1 a 4 instancias y con un elastic load balancer para distribuir la carga. 
 Todas las instancias corren en la región de San Pablo, la cual es la mas cercana y, por lo tanto, produce menor latencia.
 - Para la persistencia, se decidió utilizar DynamoDB, un servicio de base de datos NoSQL de AWS. Con este servicio, se pueden realizar peticiones de escritura y lectura de alta demanda. Se configuró un auto scaling para que responda bajo demanda. 
-Además, se configuró un Cluster DAX (DynamoDB Accelerator) con 3 nodos para poder hacer mas rápida la lectura.
-![alt text][logo]
+Con cada adn nuevo guardado se acola un mensaje nuevo en DynamoDB Streams y un cunsumidor (Lambda Function) obtiene uno a uno los mensajes y guarda la cuenta de humanos y mutantes en una tabla aparte en DynamoDB.
+![logo]
 
-[logo]:https://github.com/bgiulianetti/api-mutantes/blob/master/Arquiectura/Architecture.png "Arquitectura"
+[logo]:https://github.com/bgiulianetti/api-mutantes/blob/master/architecture/architecture-diagram.png "Arquitectura"
 
 ___
 ### Endpoints
