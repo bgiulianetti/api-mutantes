@@ -1,12 +1,15 @@
 package repositories
 
 import (
+	"bytes"
+	"fmt"
 	"math"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/bgiulianetti/api-mutantes/individual"
 	"github.com/bgiulianetti/api-mutantes/utils"
 )
@@ -94,4 +97,25 @@ func (p PersistenceService) GetStats() (individual.Stats, error) {
 		response.Ratio = math.Round(ratio*100) / 100
 	}
 	return response, nil
+}
+
+// UploadToS3 ...
+func UploadToS3(individualToPersist individual.Individual, reason string) error {
+	// The session the S3 Uploader will use
+	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("sa-east-1")}))
+	s3c := s3.New(sess)
+
+	timeStamp := utils.GenerateTimeStamp()
+	body := timeStamp + "  - ID: " + individualToPersist.ID
+
+	// Upload the file to S3.
+	_, err := s3c.PutObject(&s3.PutObjectInput{
+		Bucket: aws.String("api-mutantes-failed-request"),
+		Key:    aws.String(timeStamp + ".txt"),
+		Body:   bytes.NewReader([]byte(body + " - " + reason)),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to upload file, %v", err)
+	}
+	return nil
 }
