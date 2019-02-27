@@ -18,6 +18,38 @@ func TestIsMutantWithMutantDNA(T *testing.T) {
 	}
 }
 
+func TestIsMutantWithMutantDNAHorizontal(T *testing.T) {
+
+	mutantDNA := []string{
+		"AAAAAA",
+		"CAGTGC",
+		"TTATGT",
+		"AGAAGG",
+		"CCCCTA",
+		"TCACTG"}
+	mutant := Individual{DNA: mutantDNA, ID: "123456"}
+
+	if !mutant.IsMutant() {
+		T.Error("El adn debería ser mutante")
+	}
+}
+
+func TestIsMutantWithMutantDNASlash(T *testing.T) {
+
+	mutantDNA := []string{
+		"AATAAA",
+		"CAGTAC",
+		"TTTAGT",
+		"AGAAGG",
+		"CCGCGA",
+		"TCACGG"}
+	mutant := Individual{DNA: mutantDNA, ID: "123456"}
+
+	if !mutant.IsMutant() {
+		T.Error("El adn debería ser mutante")
+	}
+}
+
 func TestIsMutantWithHumanDNA(T *testing.T) {
 	humanDNA := []string{
 		"ATGCGA",
@@ -70,6 +102,21 @@ func TestIsDnaFormatValidWithFiveStringLength(T *testing.T) {
 		"AAAAAA",
 		"AAAAAA",
 		"AAAAAA"}
+
+	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
+	if individualWithInvalidDNA.IsDnaFormatValid() {
+		T.Error("El adn debería ser invalido")
+	}
+}
+
+func TestIsDnaFormatValidWithWrongCharacter(T *testing.T) {
+	invalidDNA := []string{
+		"AAAAAA",
+		"AAAAAA",
+		"AAAAAA",
+		"AAAAAA",
+		"AAAAAA",
+		"AAAAAX"}
 
 	individualWithInvalidDNA := Individual{DNA: invalidDNA, ID: "123456"}
 	if individualWithInvalidDNA.IsDnaFormatValid() {

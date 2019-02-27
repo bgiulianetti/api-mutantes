@@ -22,7 +22,7 @@ func Stats(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		_ = repositories.UploadToS3(individual.Individual{}, err.Error())
+		utils.LogDNA(individual.Individual{}, err.Error())
 		return
 	}
 
@@ -30,7 +30,7 @@ func Stats(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		_ = repositories.UploadToS3(individual.Individual{}, err.Error())
+		utils.LogDNA(individual.Individual{}, err.Error())
 		return
 	}
 
@@ -49,7 +49,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		_ = repositories.UploadToS3(individual, err.Error())
+		utils.LogDNA(individual, err.Error())
 		return
 	}
 
@@ -63,7 +63,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		_ = repositories.UploadToS3(individual, err.Error())
+		utils.LogDNA(individual, err.Error())
 		return
 	}
 
@@ -73,7 +73,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(500)
 			json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-			_ = repositories.UploadToS3(individual, err.Error())
+			utils.LogDNA(individual, err.Error())
 			return
 		}
 		w.WriteHeader(200)
@@ -83,7 +83,7 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(500)
 			json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-			_ = repositories.UploadToS3(individual, err.Error())
+			utils.LogDNA(individual, err.Error())
 			return
 		}
 		w.WriteHeader(403)

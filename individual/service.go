@@ -10,7 +10,7 @@ func (i Individual) IsMutant() bool {
 		for x := 0; x < len(dna); x++ {
 			reference := dna[y][x]
 
-			//  Horizontal -
+			//  Horizontal: -
 			if x < 3 &&
 				reference == dna[y][x+1] &&
 				reference == dna[y][x+2] &&
@@ -19,14 +19,14 @@ func (i Individual) IsMutant() bool {
 			}
 
 			if y < 3 {
-				//  Vertical |
+				//  Vertical: |
 				if reference == dna[y+1][x] &&
 					reference == dna[y+2][x] &&
 					reference == dna[y+3][x] {
 					mutantDnaCount++
 				}
 
-				//  Diagonal izq a der \
+				//  Diagonal:  \
 				if x < 3 &&
 					reference == dna[y+1][x+1] &&
 					reference == dna[y+2][x+2] &&
@@ -34,7 +34,7 @@ func (i Individual) IsMutant() bool {
 					mutantDnaCount++
 				}
 
-				// Diagonal der a izq /
+				// Diagonal:  /
 				if x >= 3 &&
 					reference == dna[y+1][x-1] &&
 					reference == dna[y+2][x-2] &&
