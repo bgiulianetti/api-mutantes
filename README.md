@@ -45,7 +45,7 @@ ___
 Para poder correr la API de forma local, se requiere tener instalado:
 - Java (requirements: https://docs.oracle.com/javase/7/docs/webnotes/install/windows/windows-system-requirements.html)
 - Go (requirements: https://golang.org/doc/install)
-- AWS CLI isntalada y configurada
+- AWS CLI instalada y configurada
 - AWS SDK for GO (instalar mediante el comando: go get github.com/aws/aws-sdk-go)
 - Gorilla MUX (instalar mediante el comando: go get -u github.com/gorilla/mux)
 
@@ -76,7 +76,7 @@ Se creó con un auto scaling de 1 a 4 instancias y con un elastic load balancer 
 Todas las instancias corren en la región de San Pablo, la cual es la mas cercana y, por lo tanto, produce menor latencia.
 - Para la persistencia, se decidió utilizar DynamoDB, un servicio de base de datos NoSQL de AWS. Con este servicio, se pueden realizar peticiones de escritura y lectura de alta demanda. Se configuró un auto scaling para que responda bajo demanda. 
 Con cada adn nuevo guardado se acola un mensaje nuevo en DynamoDB Streams y un consumidor (Lambda Function) obtiene uno a uno los mensajes y guarda la cuenta de humanos y mutantes en una tabla aparte en DynamoDB. 
-En caso de que algún error pueda ocurrir y no se pueda persistir el adn validado, este se guarda un log en un bucket en S3 para su posterior estudio y eventual correcto guardado, de esta manera garantizamos que no se produzca perdida de información en el caso de que falle la persistencia a DynamoDB.
+En caso de que algún error pueda ocurrir, y no se pueda persistir el adn validado, este se guarda en un log en un bucket en S3 para su posterior estudio y eventual correcto guardado, de esta manera garantizamos que no se produzca perdida de información en el caso de que falle la persistencia a DynamoDB.
 ![logo]
 
 [logo]:https://github.com/bgiulianetti/api-mutantes/blob/master/architecture/architecture-diagram.png "Arquitectura"
