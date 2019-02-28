@@ -31,8 +31,7 @@ func NewPersistenceServiceWithClient(cliente Client) (PersistenceService, error)
 // NewPersistenceService crea una sesion de conexión a dynamodb
 func NewPersistenceService() (PersistenceService, error) {
 	sess, _ := session.NewSession(&aws.Config{Region: aws.String("sa-east-1")})
-	svc := dynamodb.New(sess)
-	return PersistenceService{Session: svc}, nil
+	return PersistenceService{Session: dynamodb.New(sess)}, nil
 }
 
 // Add agrega un mutante a dynamodb
@@ -40,17 +39,14 @@ func (p PersistenceService) Add(individualToPersist individual.Individual, indiv
 
 	individualToPersist.ID = utils.ConcatenateStringArray(individualToPersist.DNA)
 
-	item, err := dynamodbattribute.MarshalMap(individualToPersist)
-	if err != nil {
-		return err
-	}
+	item, _ := dynamodbattribute.MarshalMap(individualToPersist)
 
 	input := &dynamodb.PutItemInput{
 		Item:      item,
 		TableName: aws.String(individualType),
 	}
 
-	_, err = p.Session.PutItem(input)
+	_, err := p.Session.PutItem(input)
 	if err != nil {
 		return err
 	}
@@ -69,10 +65,8 @@ func (p PersistenceService) GetStats() (individual.Stats, error) {
 	}
 
 	items := []individual.Count{}
-	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &items)
-	if err != nil {
-		return individual.Stats{}, err
-	}
+	_ = dynamodbattribute.UnmarshalListOfMaps(result.Items, &items)
+
 	response := individual.Stats{}
 
 	for _, item := range items {

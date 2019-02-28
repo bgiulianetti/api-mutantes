@@ -49,7 +49,6 @@ func DetectMutant(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		utils.LogDNA(individual, err.Error())
 		return
 	}
 

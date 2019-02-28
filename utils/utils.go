@@ -44,8 +44,7 @@ func ConcatenateStringArray(array []string) string {
 // LogDNA ...
 func LogDNA(individualToPersist individual.Individual, reason string) {
 
-	s3c := s3.New(session.Must(session.NewSession(&aws.Config{Region: aws.String("sa-east-1")})))
-	_, _ = s3c.PutObject(&s3.PutObjectInput{
+	_, _ = s3.New(session.Must(session.NewSession(&aws.Config{Region: aws.String("sa-east-1")}))).PutObject(&s3.PutObjectInput{
 		Bucket: aws.String("api-mutantes-failed-request"),
 		Key:    aws.String(GenerateTimeStamp() + ".txt"),
 		Body:   bytes.NewReader([]byte(time.Now().Format(time.RFC3339) + "  - ID: " + individualToPersist.ID + " - " + reason)),
