@@ -43,7 +43,6 @@ ___
 
 ### Dev
 Para poder correr la API de forma local, se requiere tener instalado:
-- Java (requirements: https://docs.oracle.com/javase/7/docs/webnotes/install/windows/windows-system-requirements.html)
 - Go (requirements: https://golang.org/doc/install)
 - AWS CLI instalada y configurada
 - AWS SDK for GO (instalar mediante el comando: go get github.com/aws/aws-sdk-go)
