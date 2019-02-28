@@ -22,7 +22,6 @@ func Stats(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		utils.LogDNA(individual.Individual{}, err.Error())
 		return
 	}
 
@@ -30,7 +29,6 @@ func Stats(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(ApiError{Message: err.Error()})
-		utils.LogDNA(individual.Individual{}, err.Error())
 		return
 	}
 
