@@ -1,6 +1,6 @@
 package individual
 
-// IsMutant Check if the individual is Mutant
+// IsMutant Check if the individual is Mutant...
 func (i Individual) IsMutant() bool {
 
 	dna := i.DNA
