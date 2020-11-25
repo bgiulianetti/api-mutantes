@@ -1,6 +1,6 @@
 # API Mutantes
 ### Descripción
-Se realizó el desarrollo de una API Rest en Golang, la cual expone los siguientes endpoints:
+Se realizó el desarrollo de una API Rest en Golang utilizando [Gorilla/MUX](https://github.com/gorilla/mux), la cual expone los siguientes endpoints:
 
 - __Mutant__: Detecta si un individuo es mutante o humano al analizar su ADN. 
 El ADN debe ser un array de strings: debe contener 6 items, y cada item debe poseer 6 caracteres. 
